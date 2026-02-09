@@ -3,72 +3,221 @@
 <head>
 <title>Employee Profile</title>
 
+<!-- Bootstrap CSS -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
       rel="stylesheet">
 
 <style>
+/* Page background */
 body {
-  background: linear-gradient(to right, #e0f7fa, #ffffff);
+  background: linear-gradient(120deg, #e0f7fa, #ffffff);
+  min-height: 100vh;
 }
+
+/* Card styling */
 .card {
-  border-radius: 20px;
+  border-radius: 22px;
+  transition: box-shadow 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+}
+
+/* Input focus improvement */
+.form-control:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.15rem rgba(13,110,253,.25);
+}
+
+/* Required field indicator */
+.required::after {
+  content: " *";
+  color: red;
+  font-weight: 500;
+}
+
+/* Live preview text */
+#previewText {
+  font-weight: 500;
+  color: #198754;
 }
 </style>
 </head>
 
 <body>
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
   <div class="card shadow p-4">
-    <h3 class="text-center text-primary mb-3">Employee Skill Profile</h3>
+    <h3 class="text-center text-primary mb-4">
+      Employee Skill Profile
+    </h3>
 
-    <form action="employee" method="post" onkeyup="preview()">
+    <!-- 
+      Form submission is handled by EmployeeServlet.
+      Client-side validation is done before submission.
+    -->
+    <form action="employee"
+          method="post"
+          oninput="updatePreview(); updateRating();"
+          onsubmit="return validateForm();">
 
-      <input class="form-control mb-2" name="empId" placeholder="Employee ID" required>
-      <input id="name" class="form-control mb-2" name="fullName" placeholder="Full Name" required>
+      <!-- Employee Identification -->
+      <label class="required">Employee ID</label>
+      <input class="form-control mb-3" name="empId" required>
 
-      <select class="form-control mb-2" name="gender">
-        <option>Male</option><option>Female</option>
+      <label class="required">Full Name</label>
+      <input id="fullName" class="form-control mb-3" name="fullName" required>
+
+      <!-- Personal Details -->
+      <label class="required">Gender</label>
+      <select class="form-control mb-3" name="gender" required>
+        <option value="">Select</option>
+        <option>Male</option>
+        <option>Female</option>
       </select>
 
-      <select class="form-control mb-2" name="maritalStatus">
-        <option>Single</option><option>Married</option>
+      <label class="required">Marital Status</label>
+      <select class="form-control mb-3" name="maritalStatus" required>
+        <option value="">Select</option>
+        <option>Single</option>
+        <option>Married</option>
       </select>
 
-      <input class="form-control mb-2" name="roleType" placeholder="Role Type">
-      <input class="form-control mb-2" name="primarySkills" placeholder="Primary Skills">
-      <input class="form-control mb-2" name="secondarySkills" placeholder="Secondary Skills">
-      <input class="form-control mb-2" name="certifications" placeholder="Certifications">
+      <!-- Professional Information -->
+      <label>Role Type</label>
+      <input class="form-control mb-3" name="roleType">
 
-      <input type="number" class="form-control mb-2" name="totalExp" placeholder="Total Experience">
-      <input type="number" class="form-control mb-2" name="achalaExp" placeholder="Experience at Achala">
+      <label class="required">Primary Skills</label>
+      <input class="form-control mb-3" name="primarySkills" required>
 
-      <label>Skill Rating</label>
-      <input type="range" min="1" max="5" name="skillRating" class="form-range">
+      <label>Secondary Skills</label>
+      <input class="form-control mb-3" name="secondarySkills">
 
-      <textarea class="form-control mb-2" name="skillGaps" placeholder="Skill Gaps"></textarea>
+      <label>Certifications</label>
+      <input class="form-control mb-3" name="certifications">
 
-      <select class="form-control mb-2" name="resourcing">
-        <option>Yes</option><option>No</option>
-      </select>
+      <!-- Experience -->
+      <label class="required">Total Experience (Years)</label>
+      <input type="number"
+             min="0"
+             class="form-control mb-3"
+             name="totalExp"
+             id="totalExp"
+             required>
 
-      <select class="form-control mb-2" name="onCall">
-        <option>Yes</option><option>No</option>
-      </select>
+      <label class="required">Experience at Achala (Years)</label>
+      <input type="number"
+             min="0"
+             class="form-control mb-3"
+             name="achalaExp"
+             id="achalaExp"
+             required>
 
-      <textarea class="form-control mb-2" name="comments" placeholder="Comments"></textarea>
+      <!-- Skill Rating -->
+      <label class="required">
+        Skill Rating
+        <span id="ratingValue" class="text-primary">3 / 5</span>
+      </label>
+      <input type="range"
+             min="1"
+             max="5"
+             value="3"
+             name="skillRating"
+             id="rating"
+             class="form-range mb-3">
 
-      <button class="btn btn-primary w-100 mt-3">Submit</button>
+      <label>Skill Gaps</label>
+      <textarea class="form-control mb-3" name="skillGaps"></textarea>
+
+      <!-- Availability -->
+      <label class="required fw-semibold">
+        Planned For Resourcing
+      </label>
+      <div class="mb-3">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input"
+                 type="radio"
+                 name="resourcing"
+                 value="Yes"
+                 required>
+          <label class="form-check-label">Yes</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input"
+                 type="radio"
+                 name="resourcing"
+                 value="No">
+          <label class="form-check-label">No</label>
+        </div>
+      </div>
+
+      <label class="required fw-semibold">
+        Night On-Call Support
+      </label>
+      <div class="mb-3">
+        <div class="form-check form-check-inline">
+          <input class="form-check-input"
+                 type="radio"
+                 name="onCall"
+                 value="Yes"
+                 required>
+          <label class="form-check-label">Yes</label>
+        </div>
+        <div class="form-check form-check-inline">
+          <input class="form-check-input"
+                 type="radio"
+                 name="onCall"
+                 value="No">
+          <label class="form-check-label">No</label>
+        </div>
+      </div>
+
+      <!-- Additional Information -->
+      <label>Comments</label>
+      <textarea class="form-control mb-3" name="comments"></textarea>
+
+      <button class="btn btn-primary w-100 mt-3">
+        Submit Profile
+      </button>
     </form>
 
-    <p id="previewText" class="text-success text-center mt-2"></p>
+    <!-- Live feedback to the user -->
+    <p id="previewText" class="text-center mt-3"></p>
   </div>
 </div>
 
 <script>
-function preview() {
-  let name = document.getElementById("name").value;
+/*
+  Displays a live preview using the employee name.
+*/
+function updatePreview() {
+  const name = document.getElementById("fullName").value.trim();
   document.getElementById("previewText").innerText =
-    name ? "✨ Creating profile for " + name : "";
+    name ? "Creating profile for " + name : "";
+}
+
+/*
+  Updates the skill rating text as the slider moves.
+*/
+function updateRating() {
+  const rating = document.getElementById("rating").value;
+  document.getElementById("ratingValue").innerText =
+    rating + " / 5";
+}
+
+/*
+  Business rule validation:
+  Achala experience must not exceed total experience.
+*/
+function validateForm() {
+  const total = parseInt(document.getElementById("totalExp").value);
+  const achala = parseInt(document.getElementById("achalaExp").value);
+
+  if (achala > total) {
+    alert("Experience at Achala cannot exceed total experience.");
+    return false;
+  }
+  return true;
 }
 </script>
 </body>

@@ -6,7 +6,7 @@ import java.sql.DriverManager;
 public class DBUtil {
 
     private static final String URL =
-        "jdbc:mysql://localhost:3306/employee_db";
+        "jdbc:mysql://mysql:3306/employee_db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     private static final String USER = "root";
     private static final String PASS = "root";
 
@@ -19,6 +19,16 @@ public class DBUtil {
     }
 
     public static Connection getConnection() throws Exception {
-        return DriverManager.getConnection(URL, USER, PASS);
+        int retries = 10;
+        while (retries-- > 0) {
+            try {
+                System.out.println("Trying to connect to MySQL...");
+                return DriverManager.getConnection(URL, USER, PASS);
+            } catch (Exception e) {
+                System.out.println("MySQL not ready, retrying...");
+                Thread.sleep(3000);
+            }
+        }
+        throw new Exception("Unable to connect to MySQL");
     }
 }
