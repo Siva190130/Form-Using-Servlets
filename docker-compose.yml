@@ -13,6 +13,7 @@ services:
       - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
 
   webapp:
+    image: employee-webapp:latest   # ⭐ ADD THIS
     build: .
     container_name: employee-webapp
     ports:
