@@ -1,58 +1,100 @@
 # Employee Profile Management – Dockerized Maven Web Application
 
-This project is a simple Maven-based Java web application built using Servlets, JSP, and JDBC to collect and store employee details in a MySQL database.
+This project is a simple **Maven-based Java web application** built using **Servlets, JSP, and JDBC** to collect and store employee details in a **MySQL database**.
 
-The application is fully containerized using Docker and Docker Compose and runs on Apache Tomcat 9 with JDK 8.
+The application is fully **containerized using Docker and Docker Compose** and runs on **Apache Tomcat 9 with JDK 8**.
 
 ---
 
 ## 🚀 Tech Stack
 
-- Java (JDK 8)
-- Maven (WAR packaging)
-- Servlets & JSP
-- Apache Tomcat 9
-- MySQL 8
-- Docker
-- Docker Compose
+- **Java (JDK 8)**
+- **Maven** (WAR packaging)
+- **Servlets & JSP**
+- **Apache Tomcat 9**
+- **MySQL 8**
+- **Docker**
+- **Docker Compose**
 
 ---
 
-## 📂 Project Structure
+## 🐳 Docker Architecture
 
-Docker Architecture
+### 🔹 Web Application Container (`webapp`)
+- Apache Tomcat 9 with JDK 8
+- Deploys the Maven **WAR** file
+- Exposed on **port 8080**
 
-webapp
+### 🔹 Database Container (`mysql`)
+- MySQL 8
+- Database initialized using **init.sql**
+- Uses Docker **volumes** for data persistence
 
-      1.Apache Tomcat 9 + JDK 8
-      
-      2.Deploys the Maven WAR file
-      
-      3.Exposed on port 8080
+---
 
-mysql
+## ▶️ How to Run the Application
 
-    1.MySQL 8
-    
-    2.Database initialized via init.sql
-    
-    3.Uses Docker volumes for data persistence
+### 1️⃣ Build the WAR file
+Run this command from the project root:
 
-How to Run the Application:
-1.Build the WAR file
-    mvn clean package
+```bash
+mvn clean package
+````
 
-2.Start the containers
-    docker-compose up --build
+---
 
-3.Access the application
+### 2️⃣ Start the Docker containers
+
+Build and start the application using Docker Compose:
+
+```bash
+docker-compose up --build
+```
+
+---
+
+### 3️⃣ Access the application
 
 Open your browser and navigate to:
 
-    http://localhost:8080/employee-form
+```text
+http://localhost:8080/employee-form
+```
 
-4.Verify Data in MySQL Container
+---
 
-To access MySQL running inside Docker:
+## 🔍 Verify Data in MySQL Container
 
-    docker exec -it employee-mysql mysql -uroot -proot
+To access the MySQL database running inside Docker:
+
+```bash
+docker exec -it employee-mysql mysql -uroot -proot
+```
+
+After logging in, run:
+
+```sql
+USE employee_db;
+SELECT * FROM employee_profile;
+```
+
+This confirms that employee data submitted from the application is successfully stored in the database.
+
+---
+
+## ⚠️ Important Notes
+
+* JDBC connection uses Docker **service name (`mysql`)**, not `localhost`
+* Retry logic is implemented to handle MySQL startup delays
+* Local Tomcat (Eclipse) must be **stopped** to avoid port conflicts on **8080**
+
+---
+
+## 👤 Author
+
+**Shiv**
+Associate Software Engineer
+
+```
+
+---
